@@ -4,6 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
+import csv
+import pandas as pd
+import api.linear_reg as ml
 
 
 @api_view(['GET', 'POST'])
@@ -15,8 +18,7 @@ def process_file(request):
         label = request.query_params.get("label")
         if 'file' in request.data:
             file = request.data['file']
-            print(type(file))
-            print("test!!!")
-        return Response({"message": "file received",
-                         "features": features.split(','),
-                         "label": label})
+            accuracy, model = ml.process_file(features=features, label=label, file=file)
+            print(accuracy)
+
+        return Response({"accuracy": accuracy})

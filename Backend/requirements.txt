@@ -1,4 +1,5 @@
 Django==2.1.5
+django-cors-headers==2.4.0
 django-picklefield==2.0
 djangorestframework==3.9.1
 numpy==1.16.0

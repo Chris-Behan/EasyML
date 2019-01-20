@@ -9,20 +9,24 @@ import pandas as pd
 import api.linear_reg as ml
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 def create_linear_model(request):
-    if request.method == 'GET':
+    if request.method == "GET":
         return Response({"message": "csv file"})
-    elif request.method == 'POST':
+    elif request.method == "POST":
         features = request.query_params.get("features")
         label = request.query_params.get("label")
-        if 'file' in request.data:
-            file = request.data['file']
+        if "file" in request.data:
+            file = request.data["file"]
             accuracy, mean_error, model_id = ml.process_file(features=features, label=label, file=file)
         return Response({"accuracy": accuracy,
                          "mean_error": mean_error,
                          "model_id": model_id})
 
-@api_view(['POST'])
+@api_view(["POST"])
 def linear_prediction(request):
-    return Response("hello")
+    if request.method == "POST":
+        features = request.data["features"]
+        model_id = request.data["id"]
+        prediction = ml.make_prediction(model_id, features)
+    return Response({"prediction": prediction})

@@ -54,10 +54,12 @@ def process_file(features, label, file):
     model_id = saved_model.id
     return accuracy, mean_error, model_id
 
-def depickle(id, x_test, y_test):
+
+def depickle(id):
     pickled_model = MLModel.objects.get(pk=id).ml_model
     model = pickle.loads(pickled_model)
     return model
+
 
 def save_linear_model(model, x_test, y_test):
     filename = "model1.pk1"
@@ -67,3 +69,8 @@ def save_linear_model(model, x_test, y_test):
     with open(filename, "rb") as file:
         pickle_model = pickle.load(file)
         print(pickle_model.score(x_test, y_test))
+
+
+def make_prediction(model_id, feature_list):
+    model = depickle(model_id)
+    return model.predict([feature_list])

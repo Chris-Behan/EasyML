@@ -31,22 +31,28 @@ def process_file(features, label, file):
     # y_train is 70% of our label rows
     # y_test is 30% of our label rows
     x_train, x_test, y_train, y_test = train_test_split(features_df, y, test_size=.3)
-
     lm = linear_model.LinearRegression()
-
     model = lm.fit(x_train, y_train)
     accuracy = model.score(x_test, y_test)
+
     # make predictions on the test feature set
     predictions = model.predict(x_test)
     # Calculate absolute mean error between actual values of feature set and predicted values
     mean_error = mean_absolute_error(y_test, predictions)
-    print("Accuracy of model: ", accuracy)
+    # Calculate mean price of actual test values
+    mean_price = sum(y_test) / len(y_test)
+    # Calculate "accuracy" of model on training set
+    accuracy = (1 - (mean_error / mean_price)) * 100
+    print('Mean price:$', mean_price)
+    print("Mean error:$", mean_error)
+    print('Based on this definition, the accuracy is: ', accuracy, '%')
     #save_linear_model(model, x_test, y_test)
+    # Pickle model so that it can be stored in DB
     pickled_model = pickle.dumps(model)
+    # Create and save pickled ml model and store in DB
     saved_model = MLModel.objects.create(ml_model=pickled_model)
     model_id = saved_model.id
-    depickle(model_id, x_test, y_test)
-    return accuracy, model_id
+    return accuracy, mean_error, model_id
 
 def depickle(id, x_test, y_test):
     pickled_model = MLModel.objects.get(pk=id).ml_model

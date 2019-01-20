@@ -136,22 +136,23 @@ function trainButtonDidPress() {
         const settings = {
             "async": true,
             "crossDomain": true,
-            "url": "http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice/",
+            "url": "http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice",
             "method": "POST",
             "headers": {
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/form-data",
+                "Access-Control-Allow-Origin": "*"
             },
             "processData": false,
             "contentType": false,
             "mimeType": "multipart/form-data",
             "data": form
-        }
+        };
 
         $.ajax(settings).done(function (response) {
             console.log(response);
         }).fail(function(xhr, err) {
-
-            var responseTitle= $(xhr.responseText).filter('title').get(0);
+            console.log('pizda');
+            let responseTitle= $(xhr.responseText).filter('title').get(0);
             alert($(responseTitle).text() + "\n" + formatErrorMessage(xhr, err) );
         });
     }

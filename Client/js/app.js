@@ -119,8 +119,7 @@ function fileDidAdd() {
         complete: function(results) {
             let data = results.data;
             let predictors = data[0];
-            // Test
-            //console.log(predictors);
+
             renderPretrainingView(data);
         }
     });
@@ -131,53 +130,30 @@ function trainButtonDidPress() {
     if (selectedPredictions.size > 0 && selectedAttribute !== null) {
 
         let form = new FormData();
-        let data = userFile.files[0];
-        form.append("file", data);
+        form.append("data", "/Users/lysov/Desktop/train.csv");
+        console.log(form);
 
         const settings = {
             "async": true,
             "crossDomain": true,
-            "url": "http://127.0.0.1:8000/api/files/",
+            "url": "http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice/",
             "method": "POST",
             "headers": {
-                "Content-Type": "application/x-www-form-urlencoded",
-                "cache-control": "no-cache"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
             "processData": false,
             "contentType": false,
             "mimeType": "multipart/form-data",
-            "data": data
-        };
+            "data": form
+        }
 
-        $.ajax(settings)
-            .done(function (response) {
-                console.log(response);
-            })
-            .fail(function (response) {
+        $.ajax(settings).done(function (response) {
             console.log(response);
-        })
-        ;
+        }).fail(function(xhr, err) {
 
-        /*
-
-
-
-        $.ajax({
-            url : 'http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice',
-            headers: {  'Access-Control-Allow-Origin': '*' },
-            type : 'POST',
-            data : data,
-            complete: function(data) {
-                console.log(data);
-            },
-            processData: false,  // tell jQuery not to process the data
-            contentType: false,  // tell jQuery not to set contentType
-            error: function(error) {
-                console.log('pizda');
-                console.log(error);
-            }
+            var responseTitle= $(xhr.responseText).filter('title').get(0);
+            alert($(responseTitle).text() + "\n" + formatErrorMessage(xhr, err) );
         });
-        */
     }
 
 }

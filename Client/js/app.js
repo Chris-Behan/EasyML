@@ -1,5 +1,6 @@
 let selectedPredictions = new Map();
 let selectedAttribute = null;
+let userFile = null;
 
 // Welcome view asking to provide an CSV file
 function renderWelcomeView() {
@@ -28,7 +29,7 @@ function renderPretrainingView(data) {
                 + predictors.map((predictor, index) => renderAttributes(predictor, index)).join('') +
             '</div> \
             <div class="mb-5"> \
-                <button type="button" class="btn btn-primary" onclick="trainButtonDidTrain(this)">Submit</button> \
+                <button type="button" class="btn btn-primary" onclick="trainButtonDidPress(this)">Submit</button> \
             </div>'
     );
     selectedPredictions = new Map();
@@ -113,7 +114,7 @@ function isSelected(button) {
 
 
 function fileDidAdd() {
-    let userFile = document.getElementById('file');
+    userFile = document.getElementById('file');
     Papa.parse(userFile.files[0], {
         complete: function(results) {
             let data = results.data;
@@ -125,15 +126,41 @@ function fileDidAdd() {
     });
 }
 
-function trainButtonDidTrain() {
+
+function trainButtonDidPress() {
     if (selectedPredictions.size > 0 && selectedAttribute !== null) {
+        //let formData = new FormData();
+        //formData.append('file', $('#file')[0].files[0]);
+
+        let data = userFile.files[0];
+
+        $.ajax({
+            url : 'http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice',
+            headers: {  'Access-Control-Allow-Origin': '*' },
+            type : 'POST',
+            data : data,
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,  // tell jQuery not to set contentType
+            success : function(data) {
+                console.log(data);
+            }
+        });
+
+        /*
+        let data = userFile.files[0];
+        console.log(data);
         $.ajax({
             type: "POST",
-            url: url,
+            url: "http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice",
             data: data,
-            success: success,
-            dataType: dataType
+            success: function (msg) {
+                console.log(msg)
+            },
+            error: function (error) {
+                console.log(error.responseText)
+            }
         });
+        */
     }
 
 }

@@ -129,35 +129,52 @@ function fileDidAdd() {
 
 function trainButtonDidPress() {
     if (selectedPredictions.size > 0 && selectedAttribute !== null) {
-        //let formData = new FormData();
-        //formData.append('file', $('#file')[0].files[0]);
 
+        let form = new FormData();
         let data = userFile.files[0];
+        form.append("file", data);
+
+        const settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "http://127.0.0.1:8000/api/files/",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "cache-control": "no-cache"
+            },
+            "processData": false,
+            "contentType": false,
+            "mimeType": "multipart/form-data",
+            "data": data
+        };
+
+        $.ajax(settings)
+            .done(function (response) {
+                console.log(response);
+            })
+            .fail(function (response) {
+            console.log(response);
+        })
+        ;
+
+        /*
+
+
 
         $.ajax({
             url : 'http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice',
             headers: {  'Access-Control-Allow-Origin': '*' },
             type : 'POST',
             data : data,
+            complete: function(data) {
+                console.log(data);
+            },
             processData: false,  // tell jQuery not to process the data
             contentType: false,  // tell jQuery not to set contentType
-            success : function(data) {
-                console.log(data);
-            }
-        });
-
-        /*
-        let data = userFile.files[0];
-        console.log(data);
-        $.ajax({
-            type: "POST",
-            url: "http://127.0.0.1:8000/api/files/?features=1stFlrSF&label=SalePrice",
-            data: data,
-            success: function (msg) {
-                console.log(msg)
-            },
-            error: function (error) {
-                console.log(error.responseText)
+            error: function(error) {
+                console.log('pizda');
+                console.log(error);
             }
         });
         */

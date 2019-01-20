@@ -1,3 +1,6 @@
+let selectedPredictions = new Map();
+let selectedAttribute = null;
+
 // Welcome view asking to provide an CSV file
 function renderWelcomeView() {
     //$( ".sup" ).text("Next Step...");
@@ -5,13 +8,133 @@ function renderWelcomeView() {
 }
 
 // Pretraining view asking to provide predictions and an attribute
-function renderPretrainingView() {
+function renderPretrainingView(data) {
     console.log('sup from Pretraining View');
+    let predictors = data[0];
+    $("main").html(
+        '<div class="container text-center"> \
+            <h1 class="display-1 mt-5">Easy ML</h1> \
+                <p class="lead mb-5">Machine Learning accessible to anyone!</p> \
+            <div class="col-lg col-5 text-left"> \
+                <label for="file">1. Choose your predictors (1-' + data[0].length +')</label> \
+            </div> \
+            <div id="predicate_buttons">'
+                + predictors.map((predictor, index) => renderUnselectedPredictor(predictor, index)).join('') +
+            '</div> \
+            <div class="col-lg col-5 text-left"> \
+                <label>2. Choose an attribute explanation</label> \
+            </div> \
+            <div id="attribute_buttons" class="mb-5">'
+                + predictors.map((predictor, index) => renderAttributes(predictor, index)).join('') +
+            '</div> \
+            <div class="mb-5"> \
+                <button type="button" class="btn btn-primary" onclick="trainButtonDidTrain(this)">Submit</button> \
+            </div>'
+    );
+    selectedPredictions = new Map();
+    selectedAttribute = null;
 }
 
 // Result view that provides the accuracy of the trained model as well as
 // allows to predict an attribute based on predictors
 function renderResultView() {
+
+}
+
+function renderUnselectedPredictor(predictor, index) {
+    // 0 ... n - 1
+    return '<button id=predictor_' + predictor + ' type="button" class="btn btn-secondary" onclick="predictionButtonDidClick(this)">' + predictor + '</button>';
+}
+
+function renderAttributes(predictor, index) {
+    // 0 ... n - 1
+    return '<button id=attribute_' + predictor + ' type="button" class="btn btn-secondary" onclick="attributeButtonDidClick(this)">' + predictor + '</button>';
+}
+
+function predictionButtonDidClick(button) {
+    const id = button.id.replace('predictor_', '');
+    if (selectedAttribute !== id) {
+        if (isSelected(button)) {
+            selectedPredictions.delete(id);
+            console.log(selectedPredictions);
+            unselectPredictorButton(id);
+        } else {
+            selectedPredictions.set(id, true);
+            console.log(selectedPredictions);
+            selectPredictorButton(id);
+        }
+    }
+}
+
+function attributeButtonDidClick(button) {
+    const id = button.id.replace('attribute_', '');
+    // step 2 has to be after step 1
+    if (selectedPredictions.size > 0 && !selectedPredictions.has(id)) {
+        unselectAttributeButton(selectedAttribute);
+        if (isSelected(button)) {
+            selectedAttribute = null;
+        } else {
+            // if the id is already in the predictions or don't allow the user to choose it
+            selectedAttribute = id;
+            selectAttributeButton(id);
+        }
+    }
+}
+
+// Predictor buttons
+function unselectPredictorButton(id) {
+    const element = '<button id=predictor_' + id + ' type="button" class="btn btn-secondary" onclick="predictionButtonDidClick(this)">' + id + '</button>';
+    let elementId = '#predictor_' + id;
+    $(elementId).replaceWith(element);
+}
+
+function selectPredictorButton(id) {
+    const element = '<button id=predictor_' + id + ' type="button" class="btn btn-primary" onclick="predictionButtonDidClick(this)">' + id + '</button>';
+    let elementId = '#predictor_' + id;
+    $(elementId).replaceWith(element);
+}
+
+// Attribute buttons
+function unselectAttributeButton(id) {
+    const element = '<button id=attribute_' + id + ' type="button" class="btn btn-secondary" onclick="attributeButtonDidClick(this)">' + id + '</button>';
+    let elementId = '#attribute_' + id;
+    $(elementId).replaceWith(element);
+}
+
+function selectAttributeButton(id) {
+    const element = '<button id=attribute_' + id + ' type="button" class="btn btn-primary" onclick="attributeButtonDidClick(this)">' + id + '</button>';
+    let elementId = '#attribute_' + id;
+    $(elementId).replaceWith(element);
+}
+
+function isSelected(button) {
+    return button.className.includes('btn-primary') ;
+}
+
+
+function fileDidAdd() {
+    let userFile = document.getElementById('file');
+    Papa.parse(userFile.files[0], {
+        complete: function(results) {
+            let data = results.data;
+            let predictors = data[0];
+            // Test
+            //console.log(predictors);
+            renderPretrainingView(data);
+        }
+    });
+}
+
+function trainButtonDidTrain() {
+    if (selectedPredictions.size > 0 && selectedAttribute !== null) {
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: success,
+            dataType: dataType
+        });
+    }
 
 }
 

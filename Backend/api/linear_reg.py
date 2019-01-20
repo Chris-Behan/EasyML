@@ -3,12 +3,13 @@ import csv
 from sklearn import linear_model
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-
+import pickle
+from .models import MLModel
 
 
 def process_file(features, label, file):
 
-    # convert comma seperated list of features to list
+    # convert comma separated list of features to list
     feature_list = features.split(',')
 
     # read training csv into pandas
@@ -35,5 +36,23 @@ def process_file(features, label, file):
     model = lm.fit(x_train, y_train)
     accuracy = model.score(x_test, y_test)
     print("Accuracy of model: ", accuracy)
-    print(type(model))
-    return accuracy, model
+    #save_linear_model(model, x_test, y_test)
+    pickled_model = pickle.dumps(model)
+    saved_model = MLModel.objects.create(ml_model=pickled_model)
+    model_id = saved_model.id
+    depickle(model_id, x_test, y_test)
+    return accuracy, model_id
+
+def depickle(id, x_test, y_test):
+    pickled_model = MLModel.objects.get(pk=id).ml_model
+    model = pickle.loads(pickled_model)
+    return model
+
+def save_linear_model(model, x_test, y_test):
+    filename = "model1.pk1"
+    with open(filename, "wb") as file:
+        pickle.dump(model, file)
+
+    with open(filename, "rb") as file:
+        pickle_model = pickle.load(file)
+        print(pickle_model.score(x_test, y_test))

@@ -150,10 +150,9 @@ function trainButtonDidPress() {
 
         $.ajax(settings).done(function (response) {
             console.log(response);
-        }).fail(function(xhr, err) {
+        }).fail(function(err) {
             console.log('pizda');
-            let responseTitle= $(xhr.responseText).filter('title').get(0);
-            alert($(responseTitle).text() + "\n" + formatErrorMessage(xhr, err) );
+            console.log(err);
         });
     }
 

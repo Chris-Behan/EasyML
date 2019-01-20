@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn import metrics
 import pickle
 from .models import MLModel
+from sklearn.metrics import mean_absolute_error, accuracy_score
 
 
 def process_file(features, label, file):
@@ -35,6 +36,10 @@ def process_file(features, label, file):
 
     model = lm.fit(x_train, y_train)
     accuracy = model.score(x_test, y_test)
+    # make predictions on the test feature set
+    predictions = model.predict(x_test)
+    # Calculate absolute mean error between actual values of feature set and predicted values
+    mean_error = mean_absolute_error(y_test, predictions)
     print("Accuracy of model: ", accuracy)
     #save_linear_model(model, x_test, y_test)
     pickled_model = pickle.dumps(model)
